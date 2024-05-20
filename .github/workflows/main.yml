@@ -21,7 +21,17 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name: Install coverage.py
+        run: pip install coverage
+
+      - name: Run tests with coverage and generate report
+        run: |
+          coverage run --source=. manage.py test
+          coverage xml -o coverage.xml
+
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          # Especificar la ubicación del informe de cobertura
+          SONAR_COVERAGE_REPORT_PATH: ./coverage.xml

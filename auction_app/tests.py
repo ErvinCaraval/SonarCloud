@@ -11,9 +11,9 @@ class ModelTests(TestCase):
         admin = Admin.objects.create(email="admin@example.com", password="password")
 
         # Aserciones simples para verificar que se hayan creado instancias de cada modelo
-        self.assertEqual(Auction.objects.count(), 1)
-        self.assertEqual(Artwork.objects.count(), 1)
-        self.assertEqual(Customer.objects.count(), 1)
-        self.assertEqual(Bid.objects.count(), 1)
-        self.assertEqual(Admin.objects.count(), 1)
+        self.assertEqual(auction.objects.count(), 1)
+        self.assertEqual(artwork.objects.count(), 1)
+        self.assertEqual(customer.objects.count(), 1)
+        self.assertEqual(bid.objects.count(), 1)
+        self.assertEqual(admin.objects.count(), 1)
 
