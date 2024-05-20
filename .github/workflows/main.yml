@@ -1,4 +1,7 @@
-name: SonarCloud
+
+
+
+name: Docker Compose Tests with Coverage and SonarCloud Analysis
 
 on:
   push:
@@ -9,11 +12,20 @@ on:
       - main
 
 jobs:
-  sonarcloud:
+  test_coverage_and_sonarcloud:
     runs-on: ubuntu-latest
 
+    services:
+      docker:
+        image: docker:latest
+        options: --privileged
+        ports:
+          - 8000:8000
+        env:
+          DOCKER_DRIVER: overlay2
+
     steps:
-      - name: Check out code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -21,8 +33,15 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name: Build Docker image
+        run: docker-compose build
+
+      - name: Run tests with Coverage and Docker Compose
+        run: |
+          docker-compose run --rm web sh -c "coverage run --source='.' manage.py test && coverage xml -o coverage.xml"
+
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+          SONAR_COVERAGE_REPORT_PATH: ./coverage.xml
