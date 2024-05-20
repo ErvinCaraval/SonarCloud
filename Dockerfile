@@ -5,7 +5,7 @@ FROM python:3.9-alpine3.17
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Establece el directorio de trabajo en /cod
+# Establece el directorio de trabajo en /
 WORKDIR /code
 
 # Copia todo el contenido del repositorio al directorio de trabajo del contenedor
