@@ -23,31 +23,19 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install coverage
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install coverage
 
       - name: Run tests with coverage
         run: |
-          docker-compose run --rm web sh -c "coverage run --source='.' manage.py test && coverage report -m"
-
-      - name: Calculate coverage percentage
-        id: coverage
-        run: |
-          COVERAGE=$(coverage report -m | grep -oP '\d+\.\d+(?=%)' | head -1)
-          echo "::set-output name=coverage::$COVERAGE"
-
-      - name: Check coverage threshold
-        run: |
-          COVERAGE_THRESHOLD=80.0
-          CURRENT_COVERAGE=$(echo "${{ steps.coverage.outputs.coverage }}")
-          if (( $(awk 'BEGIN {print ("'$CURRENT_COVERAGE'" >= "'$COVERAGE_THRESHOLD'")}') )); then
-            echo "Coverage is ${CURRENT_COVERAGE}% which meets the threshold of ${COVERAGE_THRESHOLD}%"
-          else
-            echo "Coverage is ${CURRENT_COVERAGE}% which does not meet the threshold of ${COVERAGE_THRESHOLD}%"
-            exit 1
-          fi
+          coverage run --source='.' manage.py test
+          coverage xml
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.python.coverage.reportPaths=coverage.xml
