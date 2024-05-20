@@ -45,6 +45,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_SCANNER_HOME: ${{ env.SONAR_SCANNER_HOME }}
         PATH: ${{ env.SONAR_SCANNER_HOME }}/bin:${{ env.PATH }}
+        JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17/x64
       run: |
         sonar-scanner \
           -Dsonar.projectKey=your_project_key \
