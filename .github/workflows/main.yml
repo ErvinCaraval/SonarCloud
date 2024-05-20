@@ -33,5 +33,5 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          # Especificar la ubicación del informe de cobertura
+          # Especificar la ubicación del informe de cobertur
           SONAR_COVERAGE_REPORT_PATH: ./coverage.xml
