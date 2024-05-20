@@ -10,9 +10,10 @@ class ModelTests(TestCase):
         bid = Bid.objects.create(auction=auction, artwork=artwork, customer=customer, bid_value=15.00, bid_timestamp="2024-04-30 13:00:00")
         admin = Admin.objects.create(email="admin@example.com", password="password")
 
-        # Aserciones simples para verificar que se hayan creado instancias de cada model
-        self.assertEqual(Auction.objects.count(), 1)
-        self.assertEqual(Artwork.objects.count(), 1)
-        self.assertEqual(Customer.objects.count(), 1)
-        self.assertEqual(Bid.objects.count(), 1)
-        self.assertEqual(Admin.objects.count(), 1)
+        # Aserciones simples para verificar que se hayan creado instancias de cada modelo
+        self.assertEqual(auction.objects.count(), 1)
+        self.assertEqual(artwork.objects.count(), 1)
+        self.assertEqual(customer.objects.count(), 1)
+        self.assertEqual(bid.objects.count(), 1)
+        self.assertEqual(admin.objects.count(), 1)
+
