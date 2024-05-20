@@ -1,7 +1,4 @@
-
-
-
-name: Docker Compose Tests with Coverage and SonarCloud Analysis
+name: SonarCloud
 
 on:
   push:
@@ -12,20 +9,11 @@ on:
       - main
 
 jobs:
-  test_coverage_and_sonarcloud:
+  sonarcloud:
     runs-on: ubuntu-latest
 
-    services:
-      docker:
-        image: docker:latest
-        options: --privileged
-        ports:
-          - 8000:8000
-        env:
-          DOCKER_DRIVER: overlay2
-
     steps:
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -33,15 +21,34 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Build Docker image
-        run: docker-compose build
-
-      - name: Run tests with Coverage and Docker Compose
+      - name: Install dependencies
         run: |
-          docker-compose run --rm web sh -c "coverage run --source='.' manage.py test && coverage xml -o coverage.xml"
+          pip install coverage
+          pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        run: |
+          coverage run --source='.' manage.py test
+          coverage report -m
+
+      - name: Calculate coverage percentage
+        id: coverage
+        run: |
+          COVERAGE=$(coverage report -m | grep -oP '\d+\.\d+(?=%)' | head -1)
+          echo "::set-output name=coverage::$COVERAGE"
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE_THRESHOLD=80.0
+          CURRENT_COVERAGE=$(echo "${{ steps.coverage.outputs.coverage }}")
+          if (( $(awk 'BEGIN {print ("'$CURRENT_COVERAGE'" >= "'$COVERAGE_THRESHOLD'")}') )); then
+            echo "Coverage is ${CURRENT_COVERAGE}% which meets the threshold of ${COVERAGE_THRESHOLD}%"
+          else
+            echo "Coverage is ${CURRENT_COVERAGE}% which does not meet the threshold of ${COVERAGE_THRESHOLD}%"
+            exit 1
+          fi
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_COVERAGE_REPORT_PATH: ./coverage.xml
