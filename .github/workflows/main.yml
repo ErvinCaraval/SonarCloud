@@ -16,21 +16,19 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
-
-      - name: Install dependencies
+      - name: Set up Docker Compose
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install coverage
+          docker-compose up -d db
+          docker-compose build web
 
       - name: Run tests with coverage
         run: |
-          coverage run --source='.' manage.py test
-          coverage xml
+          docker-compose run web sh -c "python manage.py test && coverage run --source='.' manage.py test && coverage xml"
+        env:
+          DB_HOST: db
+          DB_NAME: projecto
+          DB_USER: postgres
+          DB_PASSWORD: Ec94
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
@@ -39,3 +37,7 @@ jobs:
         with:
           args: >
             -Dsonar.python.coverage.reportPaths=coverage.xml
+
+      - name: Shut down Docker Compose
+        if: always()
+        run: docker-compose down
