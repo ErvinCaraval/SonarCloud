@@ -28,8 +28,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          coverage run --source='.' manage.py test
-          coverage report -m
+          docker-compose run --rm web sh -c "coverage run --source='.' manage.py test && coverage report -m"
 
       - name: Calculate coverage percentage
         id: coverage
